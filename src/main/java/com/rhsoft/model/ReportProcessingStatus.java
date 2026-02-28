@@ -14,4 +14,7 @@ public class ReportProcessingStatus {
 
     private String requestedAt;
     private String completedAt;
+
+    private String filePath;
+    private Long fileSize;
 }
