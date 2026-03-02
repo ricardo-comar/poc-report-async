@@ -1,7 +1,6 @@
 package com.rhsoft.mapper;
 
 import java.util.Optional;
-
 import com.azure.data.tables.models.TableEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -10,7 +9,6 @@ import com.rhsoft.ApplicationConstants;
 import com.rhsoft.model.ReportEntity;
 import com.rhsoft.model.ReportRequest;
 import com.rhsoft.model.ReportStatus;
-
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
@@ -35,7 +33,8 @@ public final class EntityMapper {
             return null;
         }
 
-        TableEntity entity = new TableEntity(ApplicationConstants.PARTITION_KEY, report.getExecutionId());
+        TableEntity entity =
+                new TableEntity(ApplicationConstants.PARTITION_KEY, report.getExecutionId());
         entity.addProperty("request", Optional.of(report.getRequest()).map(req -> {
             try {
                 return MAPPER.writeValueAsString(req);
@@ -59,16 +58,14 @@ public final class EntityMapper {
             return null;
         }
 
-        return ReportEntity.builder()
-                .executionId(entity.getRowKey())
-                .request(
-                        Optional.ofNullable(entity.getProperty("request")).map(req -> {
-                            try {
-                                return MAPPER.readValue(req.toString(), ReportRequest.class);
-                            } catch (Exception e) {
-                                throw new RuntimeException("Error deserializing report request", e);
-                            }
-                        }).orElse(null))
+        return ReportEntity.builder().executionId(entity.getRowKey())
+                .request(Optional.ofNullable(entity.getProperty("request")).map(req -> {
+                    try {
+                        return MAPPER.readValue(req.toString(), ReportRequest.class);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error deserializing report request", e);
+                    }
+                }).orElse(null))
                 .status(ReportStatus.valueOf(entity.getProperty("status").toString()))
                 .filePath((String) entity.getProperty("filePath"))
                 .fileSize((Long) entity.getProperty("fileSize"))

@@ -13,8 +13,11 @@ import com.rhsoft.model.ReportStatus;
 import com.rhsoft.storage.BlobStorageFacade;
 import com.rhsoft.storage.TableStorageFacade;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 @NoArgsConstructor
 public class ReportGeneratorService {
 

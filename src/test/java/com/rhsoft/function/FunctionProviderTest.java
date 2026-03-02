@@ -1,20 +1,17 @@
 package com.rhsoft.function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.UUID;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
 import com.microsoft.azure.functions.HttpResponseMessage;
 import com.microsoft.azure.functions.HttpStatus;
 
 
 /**
  * Unit test for Function class.
-*/
+ */
 @Disabled
 public class FunctionProviderTest extends BaseFunctionTest {
 
@@ -24,10 +21,11 @@ public class FunctionProviderTest extends BaseFunctionTest {
     public void setup() {
         executionId = UUID.randomUUID().toString();
     }
+
     /**
      * Unit test for HttpTriggerJava method.
      */
-    @Test 
+    @Test
     public void testQueued() throws Exception {
 
         // Invoke
@@ -36,6 +34,7 @@ public class FunctionProviderTest extends BaseFunctionTest {
         // Verify
         assertEquals(ret.getStatus(), HttpStatus.OK);
     }
+
     @Test
     public void testSuccess() throws Exception {
 
@@ -45,7 +44,8 @@ public class FunctionProviderTest extends BaseFunctionTest {
         // Verify
         assertEquals(ret.getStatus(), HttpStatus.CREATED);
     }
-    @Test 
+
+    @Test
     public void testNotFound() throws Exception {
 
         // Invoke
@@ -54,7 +54,8 @@ public class FunctionProviderTest extends BaseFunctionTest {
         // Verify
         assertEquals(ret.getStatus(), HttpStatus.BAD_REQUEST);
     }
-    @Test 
+
+    @Test
     public void testServerError() throws Exception {
 
         // Invoke
@@ -63,6 +64,7 @@ public class FunctionProviderTest extends BaseFunctionTest {
         // Verify
         assertEquals(ret.getStatus(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
     public void testPayloadError() throws Exception {
 
         // Invoke

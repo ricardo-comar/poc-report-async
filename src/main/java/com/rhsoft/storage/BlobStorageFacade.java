@@ -18,7 +18,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class BlobStorageFacade {
 
-    private BlobContainerClient containerClient;
+    BlobContainerClient containerClient;
 
     public BlobStorageFacade() {
 
