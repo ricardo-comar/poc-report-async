@@ -1,6 +1,7 @@
 package com.rhsoft.function;
 
 import java.util.Optional;
+import com.google.inject.Inject;
 import com.microsoft.azure.functions.ExecutionContext;
 import com.microsoft.azure.functions.HttpMethod;
 import com.microsoft.azure.functions.HttpRequestMessage;
@@ -15,18 +16,17 @@ import com.rhsoft.model.ReportRequest;
 import com.rhsoft.service.ReportGeneratorService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 /**
  * Azure Functions with HTTP Trigger.
  */
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor
 public class FunctionProvider {
 
+    @Inject
     private ReportGeneratorService reportGeneratorService;
-
-    public FunctionProvider() {
-        this.reportGeneratorService = new ReportGeneratorService();
-    }
 
     @FunctionName("Report-Provider")
     public HttpResponseMessage run(@HttpTrigger(name = "req", route = "report/{executionId}",

@@ -10,6 +10,7 @@ User request a report in a POST endpoint, and receives an UUID to query it back 
 *   Azure Table to maintain the generation lifesycle
 *   Azure Queue to allow an event based generation 
 *   Azure Blob Storage for file storage
+*   Guice for lightweight dependency injection
    
 ## Proposed Architecture
 ### Overview 
@@ -43,6 +44,7 @@ User request a report in a POST endpoint, and receives an UUID to query it back 
 * Please follow [Microsoft Docs - Code and test Azure Functions locally](https://learn.microsoft.com/en-us/azure/azure-functions/functions-develop-local?pivots=programming-language-java) to setup your local environment. I developed in Visual Studio Code with azurite to emulate Storage Account resources locally.
 * import [Postman Collection](./docs/postman_collection.json)
 * After everything set up, start debugging and try the POST endpoint.
+* You can run `mvn gatling:test` in a separated terminal to run integration tests
 
 ## Links 
 * [Azure Storage Account Tables](https://learn.microsoft.com/en-us/azure/storage/tables/table-storage-overview)

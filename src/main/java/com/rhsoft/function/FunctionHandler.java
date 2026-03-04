@@ -1,6 +1,7 @@
 package com.rhsoft.function;
 
 import java.util.Optional;
+import com.google.inject.Inject;
 import com.microsoft.azure.functions.ExecutionContext;
 import com.microsoft.azure.functions.HttpMethod;
 import com.microsoft.azure.functions.HttpRequestMessage;
@@ -18,47 +19,43 @@ import com.rhsoft.model.ReportRequest;
 import com.rhsoft.service.ReportGeneratorService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 /**
  * Azure Functions with HTTP Trigger.
  */
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor
 public class FunctionHandler {
 
-        ReportGeneratorService reportGeneratorService;
+    @Inject
+    ReportGeneratorService reportGeneratorService;
 
-        public FunctionHandler() {
-                this.reportGeneratorService = new ReportGeneratorService();
+    @FunctionName("Report-Handler")
+    public HttpResponseMessage run(@HttpTrigger(name = "req", route = "report",
+            methods = {HttpMethod.POST},
+            authLevel = AuthorizationLevel.ANONYMOUS) HttpRequestMessage<Optional<ReportRequest>> request,
+            @QueueOutput(name = "outQueueMsg",
+                    connection = ApplicationConstants.AZURE_WEB_JOBS_STORAGE,
+                    queueName = ApplicationConstants.QUEUE_NAME) OutputBinding<ReportMessage> outQueue,
+            final ExecutionContext context) {
+
+        context.getLogger().info("Report Handler triggered");
+
+        if (request.getBody().isEmpty() || request.getBody().get().getReportId() == null) {
+            return request.createResponseBuilder(HttpStatus.BAD_REQUEST)
+                    .body("Please provide report data in the request body").build();
         }
+        ReportRequest reportRequest = request.getBody().get();
 
-        @FunctionName("Report-Handler")
-        public HttpResponseMessage run(@HttpTrigger(name = "req", route = "report",
-                        methods = {HttpMethod.POST},
-                        authLevel = AuthorizationLevel.ANONYMOUS) HttpRequestMessage<Optional<ReportRequest>> request,
-                        @QueueOutput(name = "outQueueMsg",
-                                        connection = ApplicationConstants.AZURE_WEB_JOBS_STORAGE,
-                                        queueName = ApplicationConstants.QUEUE_NAME) OutputBinding<ReportMessage> outQueue,
-                        final ExecutionContext context) {
+        ReportProcessingStatus reportStatus =
+                reportGeneratorService.requestReport(reportRequest, context);
 
-                context.getLogger().info("Report Handler triggered");
+        outQueue.setValue(ReportMessage.builder().reportId(reportStatus.getReportId().toString())
+                .executionId(reportStatus.getExecutionId().toString()).request(reportRequest)
+                .build());
 
-                if (request.getBody().isEmpty() || request.getBody().get().getReportId() == null) {
-                        return request.createResponseBuilder(HttpStatus.BAD_REQUEST)
-                                        .body("Please provide report data in the request body")
-                                        .build();
-                }
-                ReportRequest reportRequest = request.getBody().get();
+        return request.createResponseBuilder(HttpStatus.ACCEPTED).body(reportStatus).build();
 
-                ReportProcessingStatus reportStatus =
-                                reportGeneratorService.requestReport(reportRequest, context);
-
-                outQueue.setValue(ReportMessage.builder()
-                                .reportId(reportStatus.getReportId().toString())
-                                .executionId(reportStatus.getExecutionId().toString())
-                                .request(reportRequest).build());
-
-                return request.createResponseBuilder(HttpStatus.ACCEPTED).body(reportStatus)
-                                .build();
-
-        }
+    }
 }

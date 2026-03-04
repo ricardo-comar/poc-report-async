@@ -1,5 +1,6 @@
 package com.rhsoft.function;
 
+import com.google.inject.Inject;
 import com.microsoft.azure.functions.ExecutionContext;
 import com.microsoft.azure.functions.annotation.FunctionName;
 import com.microsoft.azure.functions.annotation.QueueTrigger;
@@ -8,15 +9,14 @@ import com.rhsoft.model.ReportMessage;
 import com.rhsoft.service.ReportGeneratorService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor
 public class FunctionGenerator {
 
+    @Inject
     ReportGeneratorService reportGeneratorService;
-
-    public FunctionGenerator() {
-        this.reportGeneratorService = new ReportGeneratorService();
-    }
 
     @FunctionName("Report-Generator")
     public void run(

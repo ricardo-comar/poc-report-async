@@ -3,24 +3,28 @@ package com.rhsoft.storage;
 import java.io.ByteArrayInputStream;
 import java.time.OffsetDateTime;
 import java.util.Optional;
-
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.sas.BlobSasPermission;
 import com.azure.storage.blob.sas.BlobServiceSasSignatureValues;
+import com.google.inject.Singleton;
 import com.rhsoft.ApplicationConstants;
-
+import com.rhsoft.ioc.AfterInjection;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor
+@Singleton
 public class BlobStorageFacade {
 
     BlobContainerClient containerClient;
 
-    public BlobStorageFacade() {
+    @AfterInjection
+    public void initClient() {
 
         BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
                 .connectionString(System.getenv(ApplicationConstants.AZURE_WEB_JOBS_STORAGE))

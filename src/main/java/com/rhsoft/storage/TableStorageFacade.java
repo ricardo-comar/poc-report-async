@@ -1,26 +1,30 @@
 package com.rhsoft.storage;
 
 import java.util.Optional;
-
 import com.azure.data.tables.TableClient;
 import com.azure.data.tables.TableServiceClient;
 import com.azure.data.tables.TableServiceClientBuilder;
 import com.azure.data.tables.models.TableEntity;
+import com.google.inject.Singleton;
 import com.rhsoft.ApplicationConstants;
+import com.rhsoft.ioc.AfterInjection;
 import com.rhsoft.mapper.EntityMapper;
 import com.rhsoft.model.ReportEntity;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor
+@Singleton
 public class TableStorageFacade {
 
     private static final EntityMapper mapper = EntityMapper.getInstance();
 
     private TableClient tableClient;
 
-    public TableStorageFacade() {
+    @AfterInjection
+    public void initClient() {
 
         TableServiceClient tableServiceClient = new TableServiceClientBuilder()
                 .connectionString(System.getenv(ApplicationConstants.AZURE_WEB_JOBS_STORAGE))
