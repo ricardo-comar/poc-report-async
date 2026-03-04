@@ -41,8 +41,9 @@ jobs:
       uses: potatoqualitee/azuright@v1.1
 
     - name: Start Azure Functions
-      working-directory: ./function-app
+      working-directory: ./target/azure-functions/report_async-20260228093553753
       run: |
+        cp ../../../function-app/*.json ./
         func start --port 7071 &
         echo "Waiting for Functions to be ready..."
         timeout 60s bash -c 'until curl -s http://localhost:7071/admin/host/status; do sleep 2; done'
