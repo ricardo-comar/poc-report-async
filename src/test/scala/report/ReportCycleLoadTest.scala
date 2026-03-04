@@ -23,7 +23,7 @@ class ReportCycleLoadTest extends Simulation {
                                         jsonPath("$.status").is("PENDING"),
                                         jsonPath("$.executionId").exists,
                                         jsonPath("$.executionId").saveAs("executionId")))
-                        .pause(100 milliseconds, 200 milliseconds)
+                        .pause(200 milliseconds, 300 milliseconds)
 
                         .exec(_.set("poolingComplete", false))
                         .asLongAs(session => !session("poolingComplete").as[Boolean]) {
@@ -42,8 +42,6 @@ class ReportCycleLoadTest extends Simulation {
                                         val statusCode = session("gatling.http.status").asOption[Int].getOrElse(0)
                                         statusCode match {
                                                 case 201 => 
-                                                        // Report processado com sucesso
-                                                        // Validar URL salvo
                                                         session("validUrl").asOption[String] match {
                                                             case Some(url) if "^https?://.*".r.findFirstIn(url).isDefined =>
                                                                 session.set("poolingComplete", true)
@@ -53,18 +51,16 @@ class ReportCycleLoadTest extends Simulation {
                                                                 session.set("poolingComplete", true).markAsFailed
                                                         }
                                                 case 200 => 
-                                                        // Continue pooling
                                                         session
                                                 case _ => 
-                                                        // Qualquer outro código é erro
                                                         session.set("poolingComplete", true).markAsFailed
                                         }
                                 })
                                 .doIf(session => !session("poolingComplete").as[Boolean]) {
-                                        pause(250 milliseconds) // Aguardar 250ms antes da próxima tentativa
+                                        pause(500 milliseconds) 
                                 }
                         }
-                        .pause(100 milliseconds, 200 milliseconds)
+                        .pause(200 milliseconds, 500 milliseconds)
 
                 }
 

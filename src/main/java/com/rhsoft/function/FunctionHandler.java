@@ -18,16 +18,18 @@ import com.rhsoft.model.ReportRequest;
 import com.rhsoft.service.ReportGeneratorService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
 /**
  * Azure Functions with HTTP Trigger.
  */
-@NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class FunctionHandler {
 
-        ReportGeneratorService reportGeneratorService = new ReportGeneratorService();
+        ReportGeneratorService reportGeneratorService;
+
+        public FunctionHandler() {
+                this.reportGeneratorService = new ReportGeneratorService();
+        }
 
         @FunctionName("Report-Handler")
         public HttpResponseMessage run(@HttpTrigger(name = "req", route = "report",

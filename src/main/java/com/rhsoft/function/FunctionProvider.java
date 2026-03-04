@@ -13,18 +13,19 @@ import com.microsoft.azure.functions.annotation.HttpTrigger;
 import com.rhsoft.model.ReportProcessingStatus;
 import com.rhsoft.model.ReportRequest;
 import com.rhsoft.service.ReportGeneratorService;
-import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 
 /**
  * Azure Functions with HTTP Trigger.
  */
-@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class FunctionProvider {
 
-    private ReportGeneratorService reportGeneratorService = new ReportGeneratorService();
+    private ReportGeneratorService reportGeneratorService;
 
-    FunctionProvider(ReportGeneratorService reportGeneratorService) {
-        this.reportGeneratorService = reportGeneratorService;
+    public FunctionProvider() {
+        this.reportGeneratorService = new ReportGeneratorService();
     }
 
     @FunctionName("Report-Provider")
