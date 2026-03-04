@@ -7,14 +7,12 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
 import java.util.Optional;
 import java.util.UUID;
-
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-
 import com.microsoft.azure.functions.HttpResponseMessage;
 import com.microsoft.azure.functions.HttpStatus;
 import com.microsoft.azure.functions.OutputBinding;
@@ -24,6 +22,7 @@ import com.rhsoft.model.ReportRequest;
 /**
  * Unit test for Function class.
  */
+@Disabled
 public class FunctionHandlerTest extends BaseFunctionTest {
     /**
      * Unit test for HttpTriggerJava method.

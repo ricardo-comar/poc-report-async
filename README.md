@@ -51,3 +51,5 @@ User request a report in a POST endpoint, and receives an UUID to query it back 
 * [Azure Function HTTP Triggers](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger)
 * [Azure Function Blob Storage Triggers](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-storage-blob-trigger)
 * [Azure Function Queue Triggers](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-storage-queue-trigger)
+* [Azure Function Tables SDK](https://learn.microsoft.com/en-us/java/api/overview/azure/data-tables-readme)
+* [Azure Function Blob SDK](https://learn.microsoft.com/en-us/java/api/overview/azure/storage-blob-readme)

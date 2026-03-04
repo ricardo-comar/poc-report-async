@@ -27,9 +27,35 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
+    - name: Install Azure Functions Core Tools
+      run: |
+        npm install -g azure-functions-core-tools@4 --unsafe-perm true
+        func --version
+        node --version
+        
+    - name: Install Azurite
+      uses: potatoqualitee/azuright@v1.1
+
+    - name: Start Azure Functions
+      working-directory: ./function-app
+      run: |
+        func start --port 7071 &
+        echo "Waiting for Functions to be ready..."
+        timeout 60s bash -c 'until curl -s http://localhost:7071/admin/host/status; do sleep 2; done'
+
+    - name: Run Performance Tests
+      run: mvn verify 
+      
+    - name: Upload Gatling Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: gatling-reports
+        path: target/gatling/
+    
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
       uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
