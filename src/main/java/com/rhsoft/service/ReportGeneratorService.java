@@ -1,6 +1,7 @@
 package com.rhsoft.service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 import com.google.inject.Inject;
@@ -77,7 +78,8 @@ public class ReportGeneratorService {
                 byte[] reportContent = this.getClass().getClassLoader()
                         .getResourceAsStream("sample.pdf").readAllBytes();
                 String filePath = "generated/report-" + record.getExecutionId() + ".pdf";
-                blobStorage.uploadReport(filePath, reportContent);
+                blobStorage.uploadReport(filePath, reportContent,
+                                Collections.singletonMap("executionId", message.getExecutionId()));
                 record.setFilePath(filePath);
                 record.setFileSize((long) reportContent.length);
                 context.getLogger().info(

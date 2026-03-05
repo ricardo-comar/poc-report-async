@@ -2,6 +2,7 @@ package com.rhsoft.storage;
 
 import java.io.ByteArrayInputStream;
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.Optional;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
@@ -36,10 +37,11 @@ public class BlobStorageFacade {
                 .getBlobContainerClient(ApplicationConstants.BLOB_CONTAINER_NAME);
     }
 
-    public void uploadReport(String blobName, byte[] content) {
+    public void uploadReport(String blobName, byte[] content, Map<String, String> metadataFields) {
         ByteArrayInputStream dataStream = new ByteArrayInputStream(content);
         BlobClient blobClient = containerClient.getBlobClient(blobName);
         blobClient.upload(dataStream, true);
+        blobClient.setMetadata(metadataFields);
     }
 
     public Optional<String> generateAccessUrl(String blobName) {

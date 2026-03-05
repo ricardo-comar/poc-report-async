@@ -74,7 +74,7 @@ public class ReportGeneratorServiceTest {
         service.generateReport(message, context);
 
         verify(tableStorage, times(0)).upsertReport(any());
-        verify(blobStorage, times(0)).uploadReport(anyString(), any());
+        verify(blobStorage, times(0)).uploadReport(anyString(), any(), any());
     }
 
     @Test
@@ -89,7 +89,7 @@ public class ReportGeneratorServiceTest {
 
         assertEquals(ReportStatus.INVALID, entity.getStatus());
         verify(tableStorage, times(2)).upsertReport(any());
-        verify(blobStorage, times(0)).uploadReport(anyString(), any());
+        verify(blobStorage, times(0)).uploadReport(anyString(), any(), any());
     }
 
     @Test
@@ -103,7 +103,7 @@ public class ReportGeneratorServiceTest {
 
         assertEquals(ReportStatus.COMPLETED, entity.getStatus());
         verify(tableStorage, times(2)).upsertReport(any());
-        verify(blobStorage, times(1)).uploadReport(anyString(), any());
+        verify(blobStorage, times(1)).uploadReport(anyString(), any(), any());
     }
 
     @Test
