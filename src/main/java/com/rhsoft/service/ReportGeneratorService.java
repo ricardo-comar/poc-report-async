@@ -2,6 +2,7 @@ package com.rhsoft.service;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import com.google.inject.Inject;
@@ -112,6 +113,17 @@ public class ReportGeneratorService {
                         .status(record.getStatus())
                         .filePath(blobStorage.generateAccessUrl(record.getFilePath()).orElse(null))
                         .fileSize(record.getFileSize()).build());
+    }
+
+    public Optional<Integer> deleteRemovedReports(final ExecutionContext context) {
+
+            List<String> blobsToDelete = blobStorage.listBlobsToBeDeleted(context)
+                            .orElse(Collections.emptyList());
+            List<String> deletedBlobs = blobsToDelete.stream().filter(
+                            executionId -> tableStorage.deleteReport(executionId).orElse(false))
+                            .toList();
+
+            return Optional.of(deletedBlobs.size());
     }
 
 }

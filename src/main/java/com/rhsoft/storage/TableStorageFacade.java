@@ -49,4 +49,13 @@ public class TableStorageFacade {
             return Optional.empty();
         }
     }
+
+    public Optional<Boolean> deleteReport(String executionId) {
+        try {
+            tableClient.deleteEntity(ApplicationConstants.PARTITION_KEY, executionId);
+            return Optional.of(true);
+        } catch (Exception e) {
+            return Optional.of(false);
+        }
+    }
 }

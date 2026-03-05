@@ -2,6 +2,7 @@ package report
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import scala.concurrent.duration._
+import scala.sys.process._
 import com.microsoft.azure.functions.HttpStatus
 
 class ReportCycleLoadTest extends Simulation {
@@ -21,8 +22,7 @@ class ReportCycleLoadTest extends Simulation {
                                 .check(status.is(HttpStatus.ACCEPTED.value),
                                         jsonPath("$.reportId").is("#{reportId}"),
                                         jsonPath("$.status").is("PENDING"),
-                                        jsonPath("$.executionId").exists,
-                                        jsonPath("$.executionId").saveAs("executionId")))
+                                        jsonPath("$.executionId").exists.saveAs("executionId")))
                         .pause(200 milliseconds, 300 milliseconds)
 
                         .exec(_.set("poolingComplete", false))
@@ -31,17 +31,16 @@ class ReportCycleLoadTest extends Simulation {
                                         .get("/report/${executionId}")
                                         .header("accept", "application/json")
                                         .check(
-                                                status.in(200, 201), // Apenas 200 ou 201 são aceitos
-                                                checkIf(session => session("gatling.http.status").asOption[Int].contains(201)) {
-                                                        // Quando recebe 201, salva filePath para validação posterior
+                                                status.in(HttpStatus.OK.value, HttpStatus.CREATED.value), 
+                                                checkIf(session => session("gatling.http.status").asOption[Int].contains(HttpStatus.CREATED.value)) {
                                                         jsonPath("$.filePath").saveAs("validUrl")
                                                 }
                                         )
                                 )
                                 .exec(session => {
-                                        val statusCode = session("gatling.http.status").asOption[Int].getOrElse(0)
+                                        val statusCode = HttpStatus.valueOf(session("gatling.http.status").asOption[Int].getOrElse(0))
                                         statusCode match {
-                                                case 201 => 
+                                                case HttpStatus.CREATED => 
                                                         session("validUrl").asOption[String] match {
                                                             case Some(url) if "^https?://.*".r.findFirstIn(url).isDefined =>
                                                                 session.set("poolingComplete", true)
@@ -50,7 +49,7 @@ class ReportCycleLoadTest extends Simulation {
                                                             case None =>
                                                                 session.set("poolingComplete", true).markAsFailed
                                                         }
-                                                case 200 => 
+                                                case HttpStatus.OK => 
                                                         session
                                                 case _ => 
                                                         session.set("poolingComplete", true).markAsFailed
@@ -60,8 +59,21 @@ class ReportCycleLoadTest extends Simulation {
                                         pause(500 milliseconds) 
                                 }
                         }
-                        .pause(200 milliseconds, 500 milliseconds)
-
+                        // .pause(200 milliseconds, 500 milliseconds)
+                        // .exec(session => {
+                        //         val executionId = session("executionId").as[String]
+                        //         println(s"""executionId: #{executionId} """)
+                        //         // val scriptOutput = s"""az storage blob delete --container-name "reports-generated" --name "generated/report-#{executionId}.pdf"""".!
+                        //         val scriptOutput = s"""echo "generated/report-#{executionId}.pdf"""".!
+                        //         println(s"""blob deleted: #{scriptOutput} """)
+                        //         session
+                        // })
+                        // .pause(500 milliseconds)
+                        // .exec(http("Check Report Status after blob deletion")
+                        //         .get("/report/${executionId}")
+                        //         .header("accept", "application/json")
+                        //         .check(status.is(HttpStatus.NO_CONTENT.value))
+                        // )
                 }
 
         setUp(scn.inject(

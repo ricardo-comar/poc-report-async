@@ -59,6 +59,7 @@ public class FunctionProviderTest extends BaseFunctionTest {
     public void testCompleted() throws Exception {
 
         reportStatus.setStatus(ReportStatus.COMPLETED);
+        reportStatus.setFilePath("http://example.com");
         final HttpResponseMessage ret = functionProvider.run(req, executionId.toString(), context);
 
         assertEquals(ret.getStatus(), HttpStatus.CREATED);
@@ -90,6 +91,15 @@ public class FunctionProviderTest extends BaseFunctionTest {
         final HttpResponseMessage ret = functionProvider.run(req, executionId.toString(), context);
 
         assertEquals(ret.getStatus(), HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void testNoContent() throws Exception {
+
+        reportStatus.setStatus(ReportStatus.COMPLETED);
+        final HttpResponseMessage ret = functionProvider.run(req, executionId.toString(), context);
+
+        assertEquals(ret.getStatus(), HttpStatus.NO_CONTENT);
     }
 
     @Test

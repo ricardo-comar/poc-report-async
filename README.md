@@ -39,6 +39,77 @@ User request a report in a POST endpoint, and receives an UUID to query it back 
 1.  Saves the report in blob storage
 1.  User calls `GET /api/report/{requestId}` to query for generation status.
 1.  Provider Function responds with the status, with an access URL if it is ready
+2.  
+
+## Blob Storage Lifecycle Policies
+A great way to keep your resources optimized is reduce usage costs, removing data that's not relevant any more. Blob Storage has a [Lifecycle Management](https://learn.microsoft.com/en-us/azure/storage/blobs/lifecycle-management-overview) allowing apply rules to maintain data in different tiers, or "cooliers" tiers, that retention costs are gradually lower, but retrieval is costly. This is a good approach for data that needs to be retained for auditing purposes, given that access to this data has decreased over time.
+
+Below is a example of changing a blob tier to Cold, when latest modification was 30 days ago. And after a year (365 days) it gets tagged with `pending-logical-delete=true` to be logicaly deleted before . Connecting to "Cleaner" function, who runs daily to search for blobs with `pending-logical-delete=true`, removes phisically the record from Table Storage. And the last policy in blob storage removes the blob.
+
+```
+{
+  "enabled": true,
+  "rules": [
+    {
+      "name": "30d-hot-to-cold",
+      "enabled": true,
+      "type": "Lifecycle",
+      "definition": {
+        "actions": {
+          "baseBlob": {
+            "tierToCold": {
+              "daysAfterModificationGreaterThan": 30
+            }
+          }
+        },
+        "filters": {
+          "blobTypes": ["blockBlob"],
+          "prefixMatch": ["generated/"]
+        }
+      }
+    },
+    {
+      "name": "365d-add-pending-delete-tag",
+      "enabled": true,
+      "type": "Lifecycle",
+      "definition": {
+        "actions": {
+          "baseBlob": {
+            "setBlobIndex": [
+              {
+                "name": "phase",
+                "value": "pending-logical-delete"
+              }
+            ]
+          }
+        },
+        "filters": {
+          "blobTypes": ["blockBlob"],
+          "prefixMatch": ["generated/"]
+        }
+      }
+    },
+    {
+      "name": "370d-physical-delete",
+      "enabled": true,
+      "type": "Lifecycle",
+      "definition": {
+        "actions": {
+          "baseBlob": {
+            "delete": {
+              "daysAfterModificationGreaterThan": 370
+            }
+          }
+        },
+        "filters": {
+          "blobTypes": ["blockBlob"],
+          "prefixMatch": ["generated/"]
+        }
+      }
+    }
+  ]
+}
+```
   
 ## Local Setup
 * Please follow [Microsoft Docs - Code and test Azure Functions locally](https://learn.microsoft.com/en-us/azure/azure-functions/functions-develop-local?pivots=programming-language-java) to setup your local environment. I developed in Visual Studio Code with azurite to emulate Storage Account resources locally.

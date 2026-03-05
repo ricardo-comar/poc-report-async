@@ -1,16 +1,21 @@
 package com.rhsoft.storage;
 
 import java.io.ByteArrayInputStream;
+import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.azure.storage.blob.models.BlobListDetails;
+import com.azure.storage.blob.models.ListBlobsOptions;
 import com.azure.storage.blob.sas.BlobSasPermission;
 import com.azure.storage.blob.sas.BlobServiceSasSignatureValues;
 import com.google.inject.Singleton;
+import com.microsoft.azure.functions.ExecutionContext;
 import com.rhsoft.ApplicationConstants;
 import com.rhsoft.ioc.AfterInjection;
 import lombok.AccessLevel;
@@ -56,5 +61,19 @@ public class BlobStorageFacade {
                         .setStartTime(OffsetDateTime.now()));
 
         return Optional.of(String.format("%s?%s", blobClient.getBlobUrl(), sasToken));
+    }
+
+    public Optional<List<String>> listBlobsToBeDeleted(final ExecutionContext context) {
+
+            ListBlobsOptions options = new ListBlobsOptions()
+                            .setPrefix(ApplicationConstants.BLOB_PREFIX)
+                            .setDetails(new BlobListDetails().setRetrieveDeletedBlobs(false)
+                                            .setRetrieveTags(true).setRetrieveMetadata(true));
+
+            return Optional.of(containerClient
+                            .listBlobsByHierarchy("/", options, Duration.ofSeconds(10)).stream()
+                            .filter(blobItem -> "pending-logical-delete"
+                                            .equals(blobItem.getTags().get("phase")))
+                            .map(blobItem -> blobItem.getName()).toList());
     }
 }

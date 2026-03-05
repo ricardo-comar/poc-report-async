@@ -45,12 +45,13 @@ public class FunctionProvider {
                 reportGeneratorService.getReportStatus(executionId, context);
 
         HttpStatus status = reportStatus.map(report -> {
+            
             switch (report.getStatus()) {
                 case PENDING:
                 case PROCESSING:
                     return HttpStatus.OK;
                 case COMPLETED:
-                    return HttpStatus.CREATED;
+                    return report.getFilePath() != null ? HttpStatus.CREATED : HttpStatus.NO_CONTENT;
                 case INVALID:
                     return HttpStatus.UNPROCESSABLE_ENTITY;
                 case FAILED:
