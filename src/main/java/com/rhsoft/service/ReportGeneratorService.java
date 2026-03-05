@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.microsoft.azure.functions.ExecutionContext;
+import com.rhsoft.ApplicationConstants;
 import com.rhsoft.model.ReportEntity;
 import com.rhsoft.model.ReportMessage;
 import com.rhsoft.model.ReportProcessingStatus;
@@ -77,7 +78,8 @@ public class ReportGeneratorService {
             try {
                 byte[] reportContent = this.getClass().getClassLoader()
                         .getResourceAsStream("sample.pdf").readAllBytes();
-                String filePath = "generated/report-" + record.getExecutionId() + ".pdf";
+                String filePath = ApplicationConstants.BLOB_PREFIX + "/report-"
+                                + record.getExecutionId() + ".pdf";
                 blobStorage.uploadReport(filePath, reportContent,
                                 Collections.singletonMap("executionId", message.getExecutionId()));
                 record.setFilePath(filePath);
